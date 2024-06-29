@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+{% extends 'granja/veterinario.html' %}
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>R/Veterinarios</title>{% endblock %}
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'granja/css/main.css' %}">
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" 
+    integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
+<body>
+    {% block content2 %}
+    <div class="row bg-dark p-2 justify-content-between">
+      <div class="col-md-6 mx-2 py-2 pl-2 bg-light">
+        <form class="w-100" method="post" action="#">
+            {% csrf_token %}
+            <div class="mb-3">
+                <label for="animal_id" class="form-label">Número de Identificación del Animal:</label>
+                <input type="text" class="form-control" id="animal_id" name="animal_id" aria-describedby="animal_id_help" placeholder="Ingresa el número de identificación único del animal">
+              </div>
+              
+              <!-- Selección del tipo de registro -->
+              <div class="mb-3">
+                <label class="form-label">Selecciona el tipo de registro:</label><br>
+                <input type="radio" id="estado_general" name="registro" value="estado_general">
+                <label for="estado_general">Estado General del Animal</label><br>
+                <input type="radio" id="registro_vacunacion" name="registro" value="registro_vacunacion">
+                <label for="registro_vacunacion">Registro de Vacunación</label><br>
+                <input type="radio" id="registro_tratamiento" name="registro" value="registro_tratamiento">
+                <label for="registro_tratamiento">Registro de Tratamiento Médico</label><br>
+                <input type="radio" id="registro_peso" name="registro" value="registro_peso">
+                <label for="registro_peso">Registro de Peso</label><br>
+                <input type="radio" id="registro_inseminaciones" name="registro" value="registro_inseminaciones">
+                <label for="registro_inseminaciones">Registro de Inseminaciones o Montas</label><br>
+                <input type="radio" id="registro_partos" name="registro" value="registro_partos">
+                <label for="registro_partos">Registro de Partos</label>
+              </div>
+              
+              <!-- Campos de formulario dinámicos -->
+              <div id="dynamic_form_fields"></div>
+              
+              <script>
+                // Función para mostrar campos de formulario según la opción seleccionada
+                document.querySelectorAll('input[name="registro"]').forEach(function(el) {
+                  el.addEventListener('change', function() {
+                    var selected_option = document.querySelector('input[name="registro"]:checked').value;
+                    var form_fields = document.getElementById('dynamic_form_fields');
+                    form_fields.innerHTML = ""; // Limpiar campos previos
+              
+                    switch (selected_option) {
+                      case "estado_general":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="sintomas" class="form-label">¿El animal muestra signos de enfermedad o malestar?</label><br>
+                            <input type="radio" id="si" name="sintomas" value="si">
+                            <label for="si">Sí</label><br>
+                            <input type="radio" id="no" name="sintomas" value="no">
+                            <label for="no">No</label>
+                          </div>
+                          <div class="mb-3">
+                            <label for="descripcion_sintomas" class="form-label">Descripción de los síntomas:</label>
+                            <textarea id="descripcion_sintomas" name="descripcion_sintomas" class="form-control"></textarea>
+                          </div>`;
+                        break;
+              
+                      case "registro_vacunacion":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="nombre_vacuna" class="form-label">Nombre de la vacuna:</label>
+                            <input type="text" id="nombre_vacuna" name="nombre_vacuna" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="descripcion_tratamiento" class="form-label">Descripción del Tratamiento:</label>
+                            <textarea id="descripcion_tratamiento" name="descripcion_tratamiento" class="form-control"></textarea>
+                          </div>`;
+                        break;
+              
+                      case "registro_tratamiento":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="nombre_medicamento" class="form-label">Nombre del medicamento:</label>
+                            <input type="text" id="nombre_medicamento" name="nombre_medicamento" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="razon_tratamiento" class="form-label">Razón del tratamiento:</label>
+                            <textarea id="razon_tratamiento" name="razon_tratamiento" class="form-control"></textarea>
+                          </div>
+                          <div class="mb-3">
+                            <label for="dosis_administrada" class="form-label">Dosis administrada:</label>
+                            <input type="text" id="dosis_administrada" name="dosis_administrada" class="form-control">
+                          </div>`;
+                        break;
+              
+                      case "registro_peso":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="peso_actual" class="form-label">Peso Actual del Animal:</label>
+                            <input type="text" id="peso_actual" name="peso_actual" class="form-control">
+                          </div>`;
+                        break;
+              
+                      case "registro_inseminaciones":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="fecha_inseminacion" class="form-label">Fecha:</label>
+                            <input type="text" id="fecha_inseminacion" name="fecha_inseminacion" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="metodo_inseminacion" class="form-label">Método (Inseminación artificial, monta natural, etc.):</label>
+                            <input type="text" id="metodo_inseminacion" name="metodo_inseminacion" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="id_toro" class="form-label">ID del toro o material genético utilizado:</label>
+                            <input type="text" id="id_toro" name="id_toro" class="form-control">
+                          </div>`;
+                        break;
+              
+                      case "registro_partos":
+                        form_fields.innerHTML = `
+                          <div class="mb-3">
+                            <label for="fecha_parto" class="form-label">Fecha del parto:</label>
+                            <input type="text" id="fecha_parto" name="fecha_parto" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="numero_crias" class="form-label">Número de crías:</label>
+                            <input type="text" id="numero_crias" name="numero_crias" class="form-control">
+                          </div>
+                          <div class="mb-3">
+                            <label for="estado_crias" class="form-label">Estado de salud de las crías:</label>
+                            <input type="text" id="estado_crias" name="estado_crias" class="form-control">
+                          </div>`;
+                        break;
+              
+                      default:
+                        form_fields.innerHTML = "";
+                        break;
+                    }
+                  });
+                });
+              </script>
+            <button type="submit" class="btn btn-success w-100">Add</button>
+      </div>
+      <div class="col-md-5 mx-2 bg-light">
+        <div class="container">
+            <nav class="navbar navbar-light bg-light">
+                <form class="form-inline">
+                    <div class="input-group">
+                        <input class="form-control mr-sm-2" type="search" placeholder="Buscar por: fecha" aria-label="Search">
+                        <div class="input-group-append">
+                          <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+                        </div>
+                    </div>
+                </form>
+              </nav>
+        </div>
+        <div class="scroll-div">
+            <div class="scroll-object">
+                <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Estado General del Animal</p>
+                          <p class="card-text">¿Presenta signos de enfermedad?:</p>
+                          <p class="card-text">Descripción:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Registro de Vacunación</p>
+                          <p class="card-text">Nombre de la vacuna:</p>
+                          <p class="card-text">Descripción del Tratamiento:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                          <a href="#" class="btn btn-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Registro de Tratamiento Médico</p>
+                          <p class="card-text">Nombre del medicamento:</p>
+                          <p class="card-text">Razón del tratamiento:</p>
+                          <p class="card-text">Dosis administrada:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                          <a href="#" class="btn btn-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Registro de Peso</p>
+                          <p class="card-text">Peso Actual del Animal:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                          <a href="#" class="btn btn-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Registro de Inseminaciones o Montas</p>
+                          <p class="card-text">Fecha:</p>
+                          <p class="card-text">Método (Inseminación artificial, monta natural, etc.):</p>
+                          <p class="card-text">ID del toro o material genético utilizado:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                          <a href="#" class="btn btn-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-12 col-sm-12 col-md-8 col-lg-8 col-xl-8 container justify-content-center">
+                    <div class="row">
+                      <div class="card w-75 my-2 col">
+                        <div class="card-body">
+                          <h5 class="card-title">Registro Salud</h5>
+                          <p class="card-text">Tipo de Registro: Registro de Partos</p>
+                          <p class="card-text">Fecha del parto:</p>
+                          <p class="card-text">Número de crías:</p>
+                          <p class="card-text">Estado de salud de las crías:</p>
+                          <a href="#" class="btn btn-primary">Update</a>
+                          <a href="#" class="btn btn-danger">Delete</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+            </div>
+        </div>
+      </div>
+    </div>
+    {% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" 
+    integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+</body>
+</html>

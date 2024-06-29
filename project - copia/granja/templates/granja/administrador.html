@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% extends 'granja/home.html' %}
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% block title %}<title>Administrador</title>{% endblock %}
+</head>
+<body>
+    {% block inner_title %}Granja "El Manantial": Administrador{% endblock %}
+    {% block nav_option1 %}<a class="nav-link" aria-current="page" href="{% url 'logout' %}">Log Out</a>{% endblock %}
+    {% block nav_option2 %}{% endblock %}
+    {% block nav_option3 %}{% endblock %}
+
+    {% block content %}
+    <!-- CSS -->
+    <link rel="stylesheet" href="{% static 'granja/css/main.css' %}">
+    <div class="container my-5" id="menu">
+      <div class="row">
+        <div class="col-12 col-sm-12 col-md-7 col-lg-7 col-xl-7">
+          <ul class="nav nav-tabs">
+            {% url 'animals' as animals_url %}
+            {% url 'workers' as workers_url %}
+            {% url 'supplies' as supplies_url %}
+            {% url 'production' as production_url %}
+            {% url 'record' as record_url %}
+
+            {% block tab_option1 %}
+            <li class="nav-item mt-2 bg-dark">
+              <a class="nav-link {% if request.path == animals_url %}active{% endif %}" href="{% url 'animals' %}">Animales</a>
+            </li>
+            {% endblock %}
+            {% block tab_option2 %}
+            <li class="nav-item mt-2 bg-dark">
+              <a class="nav-link {% if request.path == workers_url %}active{% endif %}" href="{% url 'workers' %}">Trabajadores</a>
+            </li>
+            {% endblock %}
+            {% block tab_option3 %}
+            <li class="nav-item mt-2 bg-dark">
+              <a class="nav-link {% if request.path == supplies_url %}active{% endif %}" href="{% url 'supplies' %}">Suministros</a>
+            </li>
+            {% endblock %}
+            {% block tab_option4 %}
+            <li class="nav-item mt-2 bg-dark">
+              <a class="nav-link {% if request.path == production_url %}active{% endif %}" href="{% url 'production' %}">Producción</a>
+            </li>
+            {% endblock %}
+            {% block tab_option5 %}
+            <li class="nav-item mt-2 bg-dark">
+              <a class="nav-link {% if request.path == record_url %}active bg-light{% endif %}" href="{% url 'record' %}">Registros de Salud</a>
+            </li>
+            {% endblock %}
+          </ul>
+        </div>
+        <div class="col-12 col-sm-12 col-md-5 col-lg-5 col-xl-5">
+          <div class="text-bienvenido" style="color: white; text-align: right;">
+            <h4>Bienvenido! {{ user.first_name }}.</h4>
+          </div>
+        </div>
+      </div>
+      <div class="container-fluid p-0" id="contenedor-admin">
+        {% block content2 %}
+
+        {% endblock %}
+      </div>
+    </div>
+    {% endblock %}
+</body>
+</html>
